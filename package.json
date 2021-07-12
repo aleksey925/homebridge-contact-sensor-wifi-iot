@@ -1,0 +1,21 @@
+{
+    "name": "homebridge-contact-sensor-wifi-iot",
+    "version": "0.0.1",
+    "description": "Contact sensor plugin for Homebridge",
+    "keywords": [
+        "homebridge-plugin",
+        "door sensor",
+        "contact sensor",
+        "wifi-iot"
+    ],
+    "license": "MIT",
+    "dependencies": {},
+    "engines": {
+        "node": ">=8.0.0",
+        "homebridge": ">=0.4.20"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/aleksey925/homebridge-contact-sensor-wifi-iot.git"
+    }
+}
