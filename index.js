@@ -18,8 +18,7 @@ function ContactSensorAccessory(log, config) {
     this.login = config.login || null;
     this.password = config.password || null;
 
-    // Значение GPIO, которое используется если не удалось от контроллера получить состояние датчика. При установке
-    // этого такого статуса в приложении Дом будет отображаться, что устройство недоступно.
+    // Значение GPIO используемое для отслеживания ситуации, когда не удалось получить от контроллера статус сенсора.
     this.unknownGpioState = null;
     this.baseAuthHeader = null;
     this.isClosed = true;
@@ -111,6 +110,13 @@ ContactSensorAccessory.prototype = {
 
     getContactSensorState: function (callback) {
         this.fetchStatus((state) => {
+            if (state == this.unknownGpioState) {
+                // Благодаря этой строке в приложении "Дом" будет отображаться, что с сенсором возникли проблемы.
+                // TODO Этот способ уведомления приложения "Дом" о проблемах с сенсорами приводит к неработоспособности
+                //  всех элементов умного дома пробрасываемых через homebridge.
+                callback(new Error("Error in trying to get sensor status."));
+                return;
+            }
             this.isClosed = state;
             this.log.debug("Current contact sensor state: ", this.isClosed);
             callback(null, this.isClosed);
