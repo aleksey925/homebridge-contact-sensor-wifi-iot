@@ -80,13 +80,28 @@ ContactSensorAccessory.prototype = {
                 data += chunk;
             });
             resp.on('end', () => {
-                var gpioStatus = this.unknownGpioState;
-                try {
-                    gpioStatus = JSON.parse(data).gpio[this.gpio]
-                } catch (exception) {
-                    this.log("Exception during parsing response from the sensor.\n", exception.stack);
+                if (resp.statusCode == 200) {
+                    var gpioStatus = this.unknownGpioState;
+
+                    try {
+                        gpioStatus = JSON.parse(data).gpio[this.gpio]
+                    } catch (exception) {
+                        this.log("Exception during parsing response from the sensor.\n", exception.stack);
+                    }
+
+                    callback(gpioStatus);
+                    return
+                } else if (resp.statusCode == 401) {
+                    this.log("You cannot get sensor status. Login and password are not correct.");
+                    callback(this.unknownGpioState);
+                    return;
                 }
-                callback(gpioStatus);
+
+                this.log(
+                    "Unexpected http status received during sensor status request. statusCode: %s", resp.statusCode
+                );
+                callback(this.unknownGpioState);
+
             });
         }).on("error", (err) => {
             this.log("Error in trying to get sensor status. Error message: ", err.message);
