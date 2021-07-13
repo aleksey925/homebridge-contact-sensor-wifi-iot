@@ -18,6 +18,9 @@ function ContactSensorAccessory(log, config) {
     this.login = config.login || null;
     this.password = config.password || null;
 
+    // Значение GPIO, которое используется если не удалось от контроллера получить состояние датчика. При установке
+    // этого такого статуса в приложении Дом будет отображаться, что устройство недоступно.
+    this.unknownGpioState = null;
     this.baseAuthHeader = null;
     this.isClosed = true;
 
@@ -54,7 +57,7 @@ function ContactSensorAccessory(log, config) {
 ContactSensorAccessory.prototype = {
 
     monitorContactState: function () {
-        // Запускается каждые x раз в секунду и проверяет текущий статус сенсора.
+        // Запускается каждые x раз в секунду и проверяет текущий статус сенсора
         this.fetchStatus((state) => {
             if (this.isClosed != state) {
                 this.isClosed = state;
@@ -77,8 +80,7 @@ ContactSensorAccessory.prototype = {
                 data += chunk;
             });
             resp.on('end', () => {
-                // Значение по умолчанию, при котором в приложении Дом будет отображаться, что устройство недоступно.
-                var gpioStatus = null;
+                var gpioStatus = this.unknownGpioState;
                 try {
                     gpioStatus = JSON.parse(data).gpio[this.gpio]
                 } catch (exception) {
@@ -88,12 +90,11 @@ ContactSensorAccessory.prototype = {
             });
         }).on("error", (err) => {
             this.log("Error in trying to get sensor status. Error message: ", err.message);
-            callback(null);
+            callback(this.unknownGpioState);
         });
     },
 
     getContactSensorState: function (callback) {
-        // Дергается homekit для получения статуса сенсора
         this.fetchStatus((state) => {
             this.isClosed = state;
             this.log.debug("Current contact sensor state: ", this.isClosed);

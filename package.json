@@ -1,7 +1,7 @@
 {
     "name": "homebridge-contact-sensor-wifi-iot",
     "version": "0.0.1",
-    "description": "Contact sensor plugin for Homebridge",
+    "description": "Plugin for Homebridge to work with contact sensors running on wifi iot",
     "keywords": [
         "homebridge-plugin",
         "door sensor",
